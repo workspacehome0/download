@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # FSDP Payload - HD Wallet System
 # Platform: Windows/x64
-# Payload Wallet: admin-8dc781e9/001-7e0fcb5e
+# Payload Wallet: admin-de0de7f5/001-be6fb269
 
 import sys
 import os
@@ -21,8 +21,8 @@ except ImportError:
     print("Error: urllib not available")
     sys.exit(1)
 
-DEBUG = True
-PAYLOAD_WALLET = "admin-8dc781e9/001-7e0fcb5e"  # HD-derived child wallet
+DEBUG = False
+PAYLOAD_WALLET = "admin-de0de7f5/001-be6fb269"  # HD-derived child wallet
 
 # Blockchain-Based Discovery
 # Admin publishes location to blockchain, payload reads from blockchain
