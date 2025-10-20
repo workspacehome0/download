@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # FSDP Payload - HD Wallet System
 # Platform: Windows/x64
-# Payload Wallet: admin-de0de7f5/001-be6fb269
+# Payload Wallet: admin-a3dd2b66/001-21fa6a6a
 
 import sys
 import os
@@ -22,7 +22,7 @@ except ImportError:
     sys.exit(1)
 
 DEBUG = False
-PAYLOAD_WALLET = "admin-de0de7f5/001-be6fb269"  # HD-derived child wallet
+PAYLOAD_WALLET = "admin-a3dd2b66/001-21fa6a6a"  # HD-derived child wallet
 
 # Blockchain-Based Discovery
 # Admin publishes location to blockchain, payload reads from blockchain
